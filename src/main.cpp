@@ -2,6 +2,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
+#include "checks/accessibility.h"
 
 int main() {
     glfwInit();
@@ -69,10 +70,52 @@ int main() {
         ImGui::TextDisabled("Load a screen to begin — File > Open Image");
         ImGui::End();
 
-        // Accessibility panel
-        ImGui::Begin("Accessibility");
-        ImGui::TextDisabled("Contrast checker will appear here");
-        ImGui::End();
+       // Accessibility panel
+ImGui::Begin("Accessibility");
+
+// Storage for the two hex inputs - static means they persist between frames
+static char fgHex[8] = "000000";
+static char bgHex[8] = "FFFFFF";
+static ContrastResult result = {1.0, false, false, false};
+
+ImGui::Text("Contrast Checker");
+ImGui::Separator();
+
+ImGui::Text("Foreground #");
+ImGui::SameLine();
+ImGui::SetNextItemWidth(120);
+if (ImGui::InputText("##fg", fgHex, IM_ARRAYSIZE(fgHex)))
+    result = checkContrast(fgHex, bgHex);
+
+ImGui::Text("Background #");
+ImGui::SameLine();
+ImGui::SetNextItemWidth(120);
+if (ImGui::InputText("##bg", bgHex, IM_ARRAYSIZE(bgHex)))
+    result = checkContrast(fgHex, bgHex);
+
+ImGui::Spacing();
+ImGui::Text("Ratio: %.2f : 1", result.ratio);
+ImGui::Spacing();
+
+// AA result
+if (result.passesAA)
+    ImGui::TextColored(ImVec4(0.2f,0.8f,0.4f,1), "AA Body Text: PASS");
+else
+    ImGui::TextColored(ImVec4(1,0.3f,0.3f,1), "AA Body Text: FAIL");
+
+// AAA result
+if (result.passesAAA)
+    ImGui::TextColored(ImVec4(0.2f,0.8f,0.4f,1), "AAA Body Text: PASS");
+else
+    ImGui::TextColored(ImVec4(1,0.3f,0.3f,1), "AAA Body Text: FAIL");
+
+// Large text result
+if (result.passesAALarge)
+    ImGui::TextColored(ImVec4(0.2f,0.8f,0.4f,1), "AA Large Text: PASS");
+else
+    ImGui::TextColored(ImVec4(1,0.3f,0.3f,1), "AA Large Text: FAIL");
+
+ImGui::End();
 
         // Consistency panel
         ImGui::Begin("Consistency");

@@ -34,7 +34,10 @@ target_include_directories(imgui PUBLIC
 target_link_libraries(imgui PUBLIC glfw opengl32)
 
 # DesignIDE executable
-add_executable(DesignIDE src/main.cpp)
+add_executable(DesignIDE 
+    src/main.cpp
+    src/checks/accessibility.cpp
+)
 
 target_include_directories(DesignIDE PRIVATE
   ${CMAKE_SOURCE_DIR}/third_party
