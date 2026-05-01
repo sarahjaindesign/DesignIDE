@@ -37,6 +37,7 @@ target_link_libraries(imgui PUBLIC glfw opengl32)
 add_executable(DesignIDE 
     src/main.cpp
     src/checks/accessibility.cpp
+    src/checks/consistency.cpp
 )
 
 target_include_directories(DesignIDE PRIVATE

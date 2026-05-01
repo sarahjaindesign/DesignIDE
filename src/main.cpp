@@ -3,6 +3,7 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include "checks/accessibility.h"
+#include "checks/consistency.h"
 
 int main() {
     glfwInit();
@@ -118,9 +119,50 @@ else
 ImGui::End();
 
         // Consistency panel
-        ImGui::Begin("Consistency");
-        ImGui::TextDisabled("Palette checker will appear here");
-        ImGui::End();
+ImGui::Begin("Consistency");
+
+static char paletteInput[512] = "primary-500:#3B82F6,gray-900:#111827,white:#FFFFFF,error:#EF4444";
+static char sampleHex[8] = "3C82F7";
+static PaletteMatch match;
+static bool hasMatch = false;
+
+ImGui::Text("Off-Palette Colour Detector");
+ImGui::Separator();
+
+ImGui::Text("Palette (name:#hex, ...)");
+ImGui::SetNextItemWidth(-1);
+ImGui::InputText("##palette", paletteInput, IM_ARRAYSIZE(paletteInput));
+
+ImGui::Spacing();
+ImGui::Text("Sample Colour #");
+ImGui::SameLine();
+ImGui::SetNextItemWidth(120);
+ImGui::InputText("##sample", sampleHex, IM_ARRAYSIZE(sampleHex));
+ImGui::SameLine();
+if (ImGui::Button("Check")) {
+    auto palette = parsePalette(paletteInput);
+    match    = matchToPalette(sampleHex, palette);
+    hasMatch = true;
+}
+
+if (hasMatch) {
+    ImGui::Spacing();
+    ImGui::Text("Closest: %s (%s)",
+        match.closest.name.c_str(),
+        match.closest.hex.c_str());
+    ImGui::Text("Delta E: %.2f", match.deltaE);
+    ImGui::Spacing();
+
+    if (match.isExact)
+        ImGui::TextColored(ImVec4(0.2f,0.8f,0.4f,1), "EXACT MATCH");
+    else if (match.isClose)
+        ImGui::TextColored(ImVec4(1,0.7f,0.2f,1),
+            "CLOSE — did you mean %s?", match.closest.hex.c_str());
+    else
+        ImGui::TextColored(ImVec4(1,0.3f,0.3f,1), "OFF PALETTE");
+}
+
+ImGui::End();
 
         // Handoff panel
         ImGui::Begin("Handoff");
