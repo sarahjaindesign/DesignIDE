@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include "checks/accessibility.h"
 #include "checks/consistency.h"
+#include "checks/handoff.h"
+#include <sstream>
 
 int main() {
     glfwInit();
@@ -165,9 +167,48 @@ if (hasMatch) {
 ImGui::End();
 
         // Handoff panel
-        ImGui::Begin("Handoff");
-        ImGui::TextDisabled("Layer name linter will appear here");
-        ImGui::End();
+ImGui::Begin("Handoff");
+
+static char layerInput[2048] = "Rectangle 47\nGroup 12\nPrimaryButton\nFrame 3\nCardContainer\nVector\nicon_home\n45";
+static std::vector<LayerFinding> layerFindings;
+static bool hasLayerResults = false;
+
+ImGui::Text("Layer Name Linter");
+ImGui::Separator();
+ImGui::TextDisabled("Paste layer names, one per line:");
+ImGui::SetNextItemWidth(-1);
+ImGui::InputTextMultiline("##layers", layerInput,
+    IM_ARRAYSIZE(layerInput), ImVec2(-1, 120));
+
+if (ImGui::Button("Audit Layer Names")) {
+    // split the input into individual lines
+    std::vector<std::string> names;
+    std::stringstream ss(layerInput);
+    std::string line;
+    while (std::getline(ss, line)) {
+        if (!line.empty()) names.push_back(line);
+    }
+    layerFindings  = auditLayerNames(names);
+    hasLayerResults = true;
+}
+
+if (hasLayerResults) {
+    ImGui::Spacing();
+    if (layerFindings.empty()) {
+        ImGui::TextColored(ImVec4(0.2f,0.8f,0.4f,1),
+            "All layer names look good!");
+    } else {
+        ImGui::TextColored(ImVec4(1,0.3f,0.3f,1),
+            "%d lazy name(s) found:", (int)layerFindings.size());
+        ImGui::Separator();
+        for (const auto& f : layerFindings) {
+            ImGui::TextColored(ImVec4(1,0.5f,0.3f,1),
+                "  [%s]  %s", f.pattern.c_str(), f.name.c_str());
+        }
+    }
+}
+
+ImGui::End();
 
         // Results panel
         ImGui::Begin("Results");

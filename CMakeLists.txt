@@ -38,6 +38,8 @@ add_executable(DesignIDE
     src/main.cpp
     src/checks/accessibility.cpp
     src/checks/consistency.cpp
+        src/checks/handoff.cpp
+
 )
 
 target_include_directories(DesignIDE PRIVATE
