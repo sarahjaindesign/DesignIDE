@@ -1,0 +1,12 @@
+DesignIDE Audit Report
+======================
+
+Total findings: 7
+
+[ERROR] Accessibility: Contrast 1.00:1 — Fails AA
+[INFO] Consistency: #3C82F7 — Exact match (closest: primary-500)
+[WARNING] Handoff: Lazy layer name: Rectangle 47 [Rectangle N]
+[WARNING] Handoff: Lazy layer name: Group 12 [Group N]
+[WARNING] Handoff: Lazy layer name: Frame 3 [Frame N]
+[WARNING] Handoff: Lazy layer name: Vector [Vector]
+[WARNING] Handoff: Lazy layer name: 45 [Bare number]
